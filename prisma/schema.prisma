@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String 
+  phone String @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  posts Post[]  // 유저가 작성한 포스트 (1:N 관계)
+  likes Post[] @relation("Likes")  // 유저가 좋아요한 포스트 (N:M 관계)
+  cutes Post[] @relation("Cutes")  // 유저가 '귀엽다'한 포스트 (N:M 관계)
+  surprises Post[] @relation("Surprises")  // 유저가 놀랍다 한 포스트 (N:M 관계)
+  awesomes Post[] @relation("Awesomes")  // 유저가 '대단하다'한 포스트 (N:M 관계)
+
+    // 이벤트 참여자 및 우승자 관계 설정 (반대 관계 필드 추가)
+  participatedEvents Event[] @relation("EventParticipants")
+  wonEvents Event[] @relation("EventWinners")
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  user_id Int
+  event_photo String
+  landscape_photo String
+  created_at DateTime @default(now())
+
+    // 포스트를 작성한 유저와의 관계 (1:N 관계)
+  user User @relation(fields: [user_id], references: [id])
+
+  // 다대다 관계 설정
+  likes User[] @relation("Likes")  // 좋아요한 유저들
+  cutes User[] @relation("Cutes")  // '귀엽다'한 유저들
+  surprises User[] @relation("Surprises")  // 놀랍다고 한 유저들
+  awesomes User[] @relation("Awesomes")  // 대단하다고 한 유저들
+}
+
+model Event {
+  id Int @id @default(autoincrement())
+  location String
+  hint String
+  quest_photo String
+  created_at DateTime @default(now())
+
+ // 다대다 관계 설정 (관계 이름 명시)
+  participants User[] @relation("EventParticipants")  // 이벤트에 참여한 유저들
+  winners User[] @relation("EventWinners")  // 이벤트에서 우승한 유저들
+}
