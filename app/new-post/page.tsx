@@ -142,6 +142,7 @@ const NewPost = () => {
             id="file-upload1"
             type="file"
             accept="image/*"
+            capture="environment" // 카메라를 바로 실행 (후면 카메라)
             onChange={handleTodayImageChange}
             className="w-full hidden"
           />
