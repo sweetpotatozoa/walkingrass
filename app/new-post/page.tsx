@@ -2,6 +2,9 @@
 
 import React, { useState } from 'react'
 import { createPost } from '../actions/postActions'
+import { useRouter } from 'next/navigation'
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 최대 파일 크기 5MB
 
 function SubmitButton({ pending }: { pending: boolean }) {
   return (
@@ -10,17 +13,25 @@ function SubmitButton({ pending }: { pending: boolean }) {
       disabled={pending}
       className="absolute mt-8 bottom-20 w-[92%] max-w-[416px] flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
     >
-      {pending ? '업로드 중...' : '게시글 업로드'}
+      {pending ? (
+        <span>
+          업로드 중... <span className="spinner" /> {/* 로딩 스피너 */}
+        </span>
+      ) : (
+        '게시글 업로드'
+      )}
     </button>
   )
 }
 
-const NewPost = ({ action }: { action: (formData: FormData) => void }) => {
+const NewPost = () => {
   const [todayImage, setTodayImage] = useState<File | null>(null)
   const [myImage, setMyImage] = useState<File | null>(null)
   const [phone, setPhone] = useState<string>('')
+  const [pending, setPending] = useState<boolean>(false) // 제출 중 상태 관리
+  const router = useRouter()
 
-  // 이미지 MIME 타입을 확인하는 함수
+  // 이미지 MIME 타입과 파일 크기 확인하는 함수
   const isValidImage = (file: File | null): boolean => {
     if (!file) return false
     const validImageTypes = [
@@ -30,7 +41,9 @@ const NewPost = ({ action }: { action: (formData: FormData) => void }) => {
       'image/heic',
       'image/webp',
     ]
-    return validImageTypes.includes(file.type)
+    const isValidType = validImageTypes.includes(file.type)
+    const isValidSize = file.size <= MAX_FILE_SIZE
+    return isValidType && isValidSize
   }
 
   const handleTodayImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,14 +67,14 @@ const NewPost = ({ action }: { action: (formData: FormData) => void }) => {
 
     if (!todayImage || !isValidImage(todayImage)) {
       alert(
-        '오늘의 도토리 이미지를 올바른 이미지 파일로 업로드해주세요. (이미지 파일만 업로드 가능합니다)',
+        '오늘의 도토리 이미지를 올바른 이미지 파일로 업로드해주세요. (5MB 이하의 이미지 파일만 허용됩니다)',
       )
       return
     }
 
     if (!myImage || !isValidImage(myImage)) {
       alert(
-        '나만의 도토리 이미지를 올바른 이미지 파일로 업로드해주세요. (이미지 파일만 업로드 가능합니다)',
+        '나만의 도토리 이미지를 올바른 이미지 파일로 업로드해주세요. (5MB 이하의 이미지 파일만 허용됩니다)',
       )
       return
     }
@@ -71,6 +84,9 @@ const NewPost = ({ action }: { action: (formData: FormData) => void }) => {
       return
     }
 
+    // 제출 중 상태로 설정
+    setPending(true)
+
     // FormData 생성
     const formData = new FormData()
     formData.append('todayImage', todayImage)
@@ -78,10 +94,24 @@ const NewPost = ({ action }: { action: (formData: FormData) => void }) => {
     formData.append('phone', phone)
 
     // 서버 액션 직접 호출
-    await createPost(formData)
-  }
+    const response = await createPost(formData)
 
-  const pending = false // 여기에 실제 상태를 연결할 수 있음
+    // 제출 완료 후 상태 변경
+    setPending(false)
+
+    if (response.success) {
+      alert('게시물이 정상적으로 업로드되었습니다!')
+
+      // 폼 초기화
+      setTodayImage(null)
+      setMyImage(null)
+      setPhone('')
+
+      router.push('/') // 업로드 후 홈으로 이동
+    } else {
+      alert(response.error || '게시물 업로드에 실패했습니다.')
+    }
+  }
 
   return (
     <form onSubmit={handleClientValidation} className="mt-10 mx-4 text-white">
@@ -148,6 +178,7 @@ const NewPost = ({ action }: { action: (formData: FormData) => void }) => {
             type="text"
             placeholder="ex)01012345678"
             className="w-full text-xl bg-transparent text-white placeholder-gray-400 border-2 border-white focus:outline-none rounded-2xl py-2 px-4"
+            value={phone}
             onChange={handlePhoneChange}
           />
         </div>
