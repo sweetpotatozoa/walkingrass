@@ -1,5 +1,5 @@
 {
-  "name": "walkinglass",
+  "name": "walkingrass",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,16 +12,19 @@
     "@prisma/client": "^5.20.0",
     "@supabase/supabase-js": "^2.45.4",
     "dotenv": "^16.4.5",
+    "multer": "^1.4.5-lts.1",
     "next": "14.2.13",
     "react": "^18",
     "react-dom": "^18",
     "react-swipeable": "^7.0.1",
+    "uuid": "^10.0.0",
     "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.13",
     "eslint-config-prettier": "^9.1.0",
