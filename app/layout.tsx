@@ -18,7 +18,15 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-gray-100 text-gray-900">
         <div className="min-h-screen flex flex-col justify-between max-w-md mx-auto">
-          <main className="flex-1">{children}</main>
+          <main
+            className="flex-1"
+            style={{
+              backgroundImage: "url('/totoro.png')",
+              backgroundPosition: 'top 120% center',
+            }}
+          >
+            {children}
+          </main>
 
           {/* 네비게이션 바 */}
           <nav className="bg-white shadow-md fixed bottom-0 left-0 right-0 max-w-md mx-auto">
