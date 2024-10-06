@@ -29,8 +29,8 @@ export default function RootLayout({
           </main>
 
           {/* 네비게이션 바 */}
-          <nav className="bg-white shadow-md fixed bottom-0 left-0 right-0 max-w-md mx-auto">
-            <ul className="flex justify-around p-4">
+          <nav className="bg-black shadow-md fixed bottom-0 left-0 right-0 max-w-md mx-auto">
+            <ul className="flex justify-around p-4 text-white">
               <li>
                 <Link href="/">home</Link>
               </li>
