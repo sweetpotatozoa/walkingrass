@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-gray-100 text-gray-900">
-        <div className="min-h-screen flex flex-col justify-between max-w-md mx-auto">
+        <div className="min-h-screen flex flex-col justify-between max-w-md mx-auto overflow-y-scroll">
           <main
             className="flex-1"
             style={{
