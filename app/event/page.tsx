@@ -73,7 +73,7 @@ export default function Event() {
             </h1>
             <img src="mascot.png" alt="토토로" className="h-24 mx-auto" />
           </div>
-          <div className="absolute flex-col justify-center items-center right-4 bottom-60 bg-blue-500 pl-4 pr-8 py-2 rounded-xl rounded-bl-none">
+          <div className="absolute flex-col justify-center items-center right-4 bottom-60 bg-indigo-600 pl-4 pr-8 py-2 rounded-xl rounded-bl-none">
             <p className="mb-4">
               오늘의 도토리는 <strong>{eventData.location}</strong>에 있어!
             </p>
@@ -90,7 +90,7 @@ export default function Event() {
                 height: 0,
                 borderStyle: 'solid',
                 borderWidth: '32px 32px 0 0',
-                borderColor: '#3B82F6 transparent transparent transparent',
+                borderColor: '#4F46E5 transparent transparent transparent',
                 marginTop: '-16px',
                 marginLeft: '-32px',
                 transform: 'rotate(32deg)',

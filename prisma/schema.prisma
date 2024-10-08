@@ -9,48 +9,107 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  username String 
-  phone String @unique
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id            Int        @id @default(autoincrement())
+  username      String
+  phone         String     @unique
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  posts Post[]  // 유저가 작성한 포스트 (1:N 관계)
-  likes Post[] @relation("Likes")  // 유저가 좋아요한 포스트 (N:M 관계)
-  cutes Post[] @relation("Cutes")  // 유저가 '귀엽다'한 포스트 (N:M 관계)
-  surprises Post[] @relation("Surprises")  // 유저가 놀랍다 한 포스트 (N:M 관계)
-  awesomes Post[] @relation("Awesomes")  // 유저가 '대단하다'한 포스트 (N:M 관계)
+  // 1:N 관계
+  posts         Post[]
 
-    // 이벤트 참여자 및 우승자 관계 설정 (반대 관계 필드 추가)
-  participatedEvents Event[] @relation("EventParticipants")
-  wonEvents Event[] @relation("EventWinners")
+  // N:M 관계를 중간 테이블로 처리
+  likes         Like[]
+  cutes         Cute[]
+  surprises     Surprise[]
+  awesomes      Awesome[]
+
+  // 이벤트 참가/우승 관계
+  participatedEvents EventParticipation[]
+  wonEvents          EventWinner[]
 }
 
 model Post {
-  id Int @id @default(autoincrement())
-  user_id Int
-  event_photo String
+  id              Int        @id @default(autoincrement())
+  user_id         Int
+  event_photo     String
   landscape_photo String
-  created_at DateTime @default(now())
+  created_at      DateTime   @default(now())
 
-    // 포스트를 작성한 유저와의 관계 (1:N 관계)
-  user User @relation(fields: [user_id], references: [id])
+  // 1:N 관계
+  user            User       @relation(fields: [user_id], references: [id])
 
-  // 다대다 관계 설정
-  likes User[] @relation("Likes")  // 좋아요한 유저들
-  cutes User[] @relation("Cutes")  // '귀엽다'한 유저들
-  surprises User[] @relation("Surprises")  // 놀랍다고 한 유저들
-  awesomes User[] @relation("Awesomes")  // 대단하다고 한 유저들
+  // N:M 관계를 중간 테이블로 처리
+  likes           Like[]
+  cutes           Cute[]
+  surprises       Surprise[]
+  awesomes        Awesome[]
 }
 
 model Event {
-  id Int @id @default(autoincrement())
-  location String
-  hint String
-  quest_photo String
-  created_at DateTime @default(now())
+  id              Int        @id @default(autoincrement())
+  location        String
+  hint            String
+  quest_photo     String
+  created_at      DateTime   @default(now())
 
- // 다대다 관계 설정 (관계 이름 명시)
-  participants User[] @relation("EventParticipants")  // 이벤트에 참여한 유저들
-  winners User[] @relation("EventWinners")  // 이벤트에서 우승한 유저들
+  // 이벤트 참가자 및 우승자 관계
+  participants    EventParticipation[]
+  winners         EventWinner[]
+}
+
+// 중간 테이블 정의
+
+model Like {
+  id      Int    @id @default(autoincrement())
+  user    User   @relation(fields: [user_id], references: [id])
+  post    Post   @relation(fields: [post_id], references: [id])
+  user_id Int
+  post_id Int
+  created_at DateTime @default(now()) // 반응 시간 추적 가능
+}
+
+model Cute {
+  id      Int    @id @default(autoincrement())
+  user    User   @relation(fields: [user_id], references: [id])
+  post    Post   @relation(fields: [post_id], references: [id])
+  user_id Int
+  post_id Int
+  created_at DateTime @default(now())
+}
+
+model Surprise {
+  id      Int    @id @default(autoincrement())
+  user    User   @relation(fields: [user_id], references: [id])
+  post    Post   @relation(fields: [post_id], references: [id])
+  user_id Int
+  post_id Int
+  created_at DateTime @default(now())
+}
+
+model Awesome {
+  id      Int    @id @default(autoincrement())
+  user    User   @relation(fields: [user_id], references: [id])
+  post    Post   @relation(fields: [post_id], references: [id])
+  user_id Int
+  post_id Int
+  created_at DateTime @default(now())
+}
+
+// 이벤트 참가와 우승자 관계를 위한 중간 테이블
+
+model EventParticipation {
+  id       Int    @id @default(autoincrement())
+  user     User   @relation(fields: [user_id], references: [id])
+  event    Event  @relation(fields: [event_id], references: [id])
+  user_id  Int
+  event_id Int
+}
+
+model EventWinner {
+  id       Int    @id @default(autoincrement())
+  user     User   @relation(fields: [user_id], references: [id])
+  event    Event  @relation(fields: [event_id], references: [id])
+  user_id  Int
+  event_id Int
 }
