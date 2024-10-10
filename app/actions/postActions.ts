@@ -11,6 +11,26 @@ interface PostState {
   error: string | null
 }
 
+// 거리 계산 함수
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
+  const R = 6371 // 지구의 반지름 (킬로미터)
+  const dLat = (lat2 - lat1) * (Math.PI / 180)
+  const dLon = (lon2 - lon1) * (Math.PI / 180)
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return R * c // 킬로미터
+}
+
 // createPost 함수의 타입 정의
 export async function createPost(
   formData: FormData, // FormData만 받도록 수정
@@ -18,6 +38,7 @@ export async function createPost(
   const phone = formData.get('phone') as string
   const todayImage = formData.get('todayImage') as File | null
   const myImage = formData.get('myImage') as File | null
+  const gpsLocation = JSON.parse(formData.get('gpsLocation') as string) // GPS 위치 가져오기
 
   // 필수 필드 확인
   if (!phone) {
@@ -33,6 +54,32 @@ export async function createPost(
   }
 
   try {
+    // 가장 최근 이벤트의 GPS 위치 가져오기
+    const event = await prisma.event.findFirst({
+      orderBy: { created_at: 'desc' }, // createdAt 필드에 따라 내림차순 정렬
+      select: { latitude: true, longitude: true },
+    })
+
+    if (!event) {
+      return { success: false, error: '이벤트 정보를 찾을 수 없습니다.' }
+    }
+
+    // GPS 거리 확인
+    const distance = calculateDistance(
+      gpsLocation.latitude,
+      gpsLocation.longitude,
+      event.latitude,
+      event.longitude,
+    )
+
+    if (distance > 0.05) {
+      // 1km 이상이면 유효하지 않음
+      return {
+        success: false,
+        error: '현재 위치가 이벤트와 유효한 거리를 벗어났습니다.',
+      }
+    }
+
     // Supabase 스토리지에 이미지 업로드
     const uploadedImages = await Promise.all(
       [todayImage, myImage].map(async (image, index) => {

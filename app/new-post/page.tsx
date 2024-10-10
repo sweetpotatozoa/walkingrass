@@ -28,6 +28,10 @@ const NewPost = () => {
   const [todayImage, setTodayImage] = useState<File | null>(null)
   const [myImage, setMyImage] = useState<File | null>(null)
   const [phone, setPhone] = useState<string>('')
+  const [gpsLocation, setGpsLocation] = useState<{
+    latitude: number
+    longitude: number
+  } | null>(null)
   const [pending, setPending] = useState<boolean>(false) // 제출 중 상태 관리
   const router = useRouter()
 
@@ -46,9 +50,12 @@ const NewPost = () => {
     return isValidType && isValidSize
   }
 
-  const handleTodayImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTodayImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    await getCurrentLocation() // 먼저 GPS 위치 수집
     if (e.target.files && e.target.files[0]) {
-      setTodayImage(e.target.files[0])
+      setTodayImage(e.target.files[0]) // 위치 수집 후 사진 설정
     }
   }
 
@@ -60,6 +67,37 @@ const NewPost = () => {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhone(e.target.value)
+  }
+
+  // GPS 위치를 수집하는 함수
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          setGpsLocation({ latitude, longitude })
+        },
+        (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              alert(
+                '위치 정보 접근이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용하세요.',
+              )
+              break
+            case error.POSITION_UNAVAILABLE:
+              alert(
+                '위치 정보를 사용할 수 없습니다. GPS가 켜져 있는지 확인하세요.',
+              )
+              break
+            case error.TIMEOUT:
+              alert('위치 정보 요청 시간이 초과되었습니다.')
+              break
+          }
+        },
+      )
+    } else {
+      alert('이 브라우저는 Geolocation을 지원하지 않습니다.')
+    }
   }
 
   const handleClientValidation = async (e: React.FormEvent) => {
@@ -84,6 +122,11 @@ const NewPost = () => {
       return
     }
 
+    if (!gpsLocation) {
+      alert('위치를 가져오지 못했습니다. GPS가 켜져있는지 확인해주세요.')
+      return
+    }
+
     // 제출 중 상태로 설정
     setPending(true)
 
@@ -92,6 +135,7 @@ const NewPost = () => {
     formData.append('todayImage', todayImage)
     formData.append('myImage', myImage)
     formData.append('phone', phone)
+    formData.append('gpsLocation', JSON.stringify(gpsLocation)) // GPS 위치 추가
 
     // 서버 액션 직접 호출
     const response = await createPost(formData)
@@ -106,6 +150,7 @@ const NewPost = () => {
       setTodayImage(null)
       setMyImage(null)
       setPhone('')
+      setGpsLocation(null)
 
       router.push('/') // 업로드 후 홈으로 이동
     } else {
