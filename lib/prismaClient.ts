@@ -1,18 +1,16 @@
 import { PrismaClient } from '@prisma/client'
 
 declare global {
-  // const로 변경하여 ESLint 경고 해결
-  const globalWithPrisma: typeof global & {
-    prisma: PrismaClient | undefined
-  }
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined
 }
 
 const prisma =
-  globalWithPrisma.prisma ||
+  global.prisma ||
   new PrismaClient({
     log: ['query', 'info', 'warn', 'error'],
   })
 
-if (process.env.NODE_ENV !== 'production') globalWithPrisma.prisma = prisma
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma
 
 export default prisma
