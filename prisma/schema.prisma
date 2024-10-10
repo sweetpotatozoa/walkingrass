@@ -51,6 +51,8 @@ model Event {
   location        String
   hint            String
   quest_photo     String
+  latitude        Float
+  longitude       Float
   created_at      DateTime   @default(now())
 
   // 이벤트 참가자 및 우승자 관계
