@@ -9,7 +9,7 @@ export default function MainPage() {
 
   useEffect(() => {
     fetchPostList() // 처음 로드 시 포스트 불러오기
-  }, [])
+  }, [fetchPostList])
 
   useEffect(() => {
     if (postList.length > 0) {
