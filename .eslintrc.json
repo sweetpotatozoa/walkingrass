@@ -3,5 +3,8 @@
     "next/core-web-vitals",
     "next/typescript",
     "plugin:prettier/recommended"
-  ]
+  ],
+  "globals": {
+    "prisma": "readonly" // prisma를 읽기 전용 전역 변수로 설정
+  }
 }
