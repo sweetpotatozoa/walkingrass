@@ -1,4 +1,3 @@
-// actions/getEvent.ts
 'use server'
 // actions/getLatestEvent.ts
 import prisma from '@/lib/prismaClient'
@@ -12,12 +11,12 @@ export async function getLatestEvent(): Promise<EventWithParticipantsAndWinners 
     include: {
       participants: {
         select: {
-          id: true, // participants의 id 값만 가져옴
+          user_id: true, // participants의 id 값만 가져옴
         },
       },
       winners: {
         select: {
-          id: true, // winners의 id 값만 가져옴
+          user_id: true, // winners의 id 값만 가져옴
         },
       },
     },
@@ -27,7 +26,7 @@ export async function getLatestEvent(): Promise<EventWithParticipantsAndWinners 
 
   return {
     ...event,
-    participants: event.participants.map((p) => p.id),
-    winners: event.winners.map((w) => w.id),
+    participants: event.participants.map((p) => p.user_id), // Participant 타입 명시
+    winners: event.winners.map((w) => w.user_id), // Winner 타입 명시
   }
 }
