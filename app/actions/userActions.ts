@@ -75,7 +75,7 @@ export async function getUserProfileWithEvents(
     id: userData.id,
     username: userData.username,
     posts: userData.posts
-      ? userData.posts.map((post) => ({
+      ? userData.posts.map((post: { id: number; created_at: Date }) => ({
           id: post.id,
           created_at: post.created_at,
         }))
