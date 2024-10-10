@@ -26,7 +26,7 @@ export async function getLatestEvent(): Promise<EventWithParticipantsAndWinners 
 
   return {
     ...event,
-    participants: event.participants.map((p) => p.user_id), // Participant 타입 명시
-    winners: event.winners.map((w) => w.user_id), // Winner 타입 명시
+    participants: event.participants.map((p: { user_id: number }) => p.user_id), // Participant 타입 명시
+    winners: event.winners.map((w: { user_id: number }) => w.user_id), // Winner 타입 명시
   }
 }
