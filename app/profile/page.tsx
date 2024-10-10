@@ -58,7 +58,7 @@ export default function Profile() {
           </div>
           <div></div>
           <div className="w-full flex flex-col justify-center items-center">
-            <img src="my_today_dotori.svg"></img>
+            <img src="my_today_dotori.svg" alt="오늘의 토토로"></img>
             <div className="text-4xl my-4">
               X {userData.eventParticipationCount} 개
             </div>
@@ -71,22 +71,22 @@ export default function Profile() {
           {/* 감정표현 총합 */}
           <div className="w-full flex flex-row justify-between items-center px-8 mt-10">
             <div className="flex flex-col justify-center items-center">
-              <img src="dotori.png" className="mb-4"></img>
+              <img src="dotori.png" alt="좋아요" className="mb-4"></img>
               <div className="text-xl">{userData.totalLikes} 개</div>{' '}
               {/* 좋아요 */}
             </div>
             <div className="flex flex-col justify-center items-center">
-              <img src="dotori.png" className="mb-4"></img>
+              <img src="dotori.png" alt="귀엽다" className="mb-4"></img>
               <div className="text-xl">{userData.totalCutes} 개</div>{' '}
               {/* 귀엽다 */}
             </div>
             <div className="flex flex-col justify-center items-center">
-              <img src="dotori.png" className="mb-4"></img>
+              <img src="dotori.png" alt="놀랍다" className="mb-4"></img>
               <div className="text-xl">{userData.totalSurprises} 개</div>{' '}
               {/* 놀랍다 */}
             </div>
             <div className="flex flex-col justify-center items-center">
-              <img src="dotori.png" className="mb-4"></img>
+              <img src="dotori.png" alt="대단하다" className="mb-4"></img>
               <div className="text-xl">{userData.totalAwesomes} 개</div>{' '}
               {/* 대단하다 */}
             </div>
