@@ -110,7 +110,7 @@ export async function createPost(
       landscape_photo: myImageUrl,
     }
 
-    const post = await prisma.post.create({
+    await prisma.post.create({
       data: postData,
     })
 
@@ -119,8 +119,15 @@ export async function createPost(
     revalidatePath('/profile')
 
     return { success: true, error: null }
-  } catch (error: any) {
-    console.error('Error creating post:', error.message || error)
-    return { success: false, error: '게시글 생성에 실패했습니다.' }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      // error가 Error 인스턴스인 경우 메시지 출력
+      console.error('Error creating post:', error.message)
+      return { success: false, error: error.message } // 실제 에러 메시지 반환
+    } else {
+      // error가 Error가 아닌 경우
+      console.error('An unknown error occurred:', error)
+      return { success: false, error: '게시글 생성에 실패했습니다.' }
+    }
   }
 }
