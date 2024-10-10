@@ -1,18 +1,18 @@
 import { PrismaClient } from '@prisma/client'
 
-let globalWithPrisma = global as typeof globalThis & {
-  prisma: PrismaClient
-}
-
-let prisma: PrismaClient
-
-if (process.env.NODE_ENV === 'production') {
-  prisma = new PrismaClient()
-} else {
-  if (!globalWithPrisma.prisma) {
-    globalWithPrisma.prisma = new PrismaClient()
+declare global {
+  // const로 변경하여 ESLint 경고 해결
+  const globalWithPrisma: typeof global & {
+    prisma: PrismaClient | undefined
   }
-  prisma = globalWithPrisma.prisma
 }
+
+const prisma =
+  globalWithPrisma.prisma ||
+  new PrismaClient({
+    log: ['query', 'info', 'warn', 'error'],
+  })
+
+if (process.env.NODE_ENV !== 'production') globalWithPrisma.prisma = prisma
 
 export default prisma
