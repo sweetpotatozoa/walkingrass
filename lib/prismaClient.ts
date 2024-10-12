@@ -8,6 +8,12 @@ declare global {
 const prisma =
   global.prisma ||
   new PrismaClient({
+    datasources: {
+      db: {
+        // 기존 DATABASE_URL에 pgbouncer 옵션 추가
+        url: process.env.DATABASE_URL + '?pgbouncer=true',
+      },
+    },
     log: ['query', 'info', 'warn', 'error'],
   })
 

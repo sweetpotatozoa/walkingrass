@@ -1,18 +1,20 @@
-// app/Mainpage.tsx
-
 'use client'
 
+import { useState } from 'react'
 import { Post, User } from '@/types/post'
 
 export default function Mainpage({
-  postList,
+  postList: initialPostList,
   userdata,
 }: {
   postList: Post[]
   userdata: User
 }) {
+  const [postList, setPostList] = useState<Post[]>(initialPostList)
+
   const handleReaction = async (postId: number, reactionType: string) => {
     try {
+      // 해당 반응에 대한 API 요청 전송
       const response = await fetch(`/api/reactions/${postId}`, {
         method: 'POST',
         headers: {
@@ -25,11 +27,36 @@ export default function Mainpage({
       })
 
       if (!response.ok) {
+        // 서버에서 에러 응답을 받았을 경우
+        const errorMessage = await response.json()
+        alert(errorMessage.message || 'Failed to update reaction')
         throw new Error('Failed to update reaction')
       }
 
-      const updatedPost = await response.json()
-      console.log('Updated post:', updatedPost)
+      // 성공적으로 업데이트된 포스트 데이터를 받음
+      const updatedReaction = await response.json()
+
+      // postList 업데이트
+      setPostList((prevList) =>
+        prevList.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                // 반응 종류에 따라 해당 값을 증가시킴
+                likes: reactionType === 'Like' ? post.likes + 1 : post.likes,
+                cutes: reactionType === 'Cute' ? post.cutes + 1 : post.cutes,
+                surprises:
+                  reactionType === 'Surprise'
+                    ? post.surprises + 1
+                    : post.surprises,
+                awesomes:
+                  reactionType === 'Awesome'
+                    ? post.awesomes + 1
+                    : post.awesomes,
+              }
+            : post,
+        ),
+      )
     } catch (error) {
       console.error('Error updating reaction:', error)
     }
