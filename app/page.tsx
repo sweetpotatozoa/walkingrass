@@ -1,73 +1,15 @@
-'use client'
+// app/page.tsx (서버 컴포넌트)
+import { getPost, getUserId } from 'app/actions/mainActions.ts' // 서버 액션 불러오기
+import Mainpage from './Mainpage' // 클라이언트 컴포넌트 불러오기
 
-import { useEffect } from 'react'
-import { useStore } from './store/useStore' // Zustand로 상태 관리
-import { useSwipeable } from 'react-swipeable' // 스와이프를 위한 라이브러리
-
-export default function MainPage() {
-  const { postList, fetchPostList } = useStore()
-
-  useEffect(() => {
-    fetchPostList() // 처음 로드 시 포스트 불러오기
-  }, [fetchPostList])
-
-  useEffect(() => {
-    if (postList.length > 0) {
-      console.log(postList) // postList가 업데이트된 후에 로그 찍기
-    }
-  }, [postList]) // postList가 변경될 때마다 실행
-
-  const handlers = useSwipeable({
-    onSwipedUp: () => console.log('Swiped up!'), // 다음 포스트로 이동
-    onSwipedDown: () => console.log('Swiped down!'), // 이전 포스트로 이동
-  })
+export default async function MainPage() {
+  const postList = await getPost() // 서버 액션을 호출하여 데이터를 가져옴
+  const userdata = await getUserId(1)
 
   return (
-    <div {...handlers} className="min-h-screen">
-      {postList.length > 0 ? ( // postList가 있을 때만 렌더링
-        postList.map((post, index) => (
-          <div
-            key={index}
-            className="min-h-screen flex overflow-x-auto relative"
-          >
-            {/* Buttons */}
-            <div className="fixed top-4 left-4 z-50">
-              <button className="bg-blue-500 text-white py-2 px-4 rounded m-2">
-                👍 좋아요 {post.likes ? post.likes.length : 0}
-              </button>
-              <button className="bg-pink-500 text-white py-2 px-4 rounded m-2">
-                🐱 귀여워요 {post.cutes ? post.cutes.length : 0}
-              </button>
-              <button className="bg-yellow-500 text-white py-2 px-4 rounded m-2">
-                😮 놀라워요 {post.surprises ? post.surprises.length : 0}
-              </button>
-              <button className="bg-green-500 text-white py-2 px-4 rounded m-2">
-                💯 최고예요 {post.awesomes ? post.awesomes.length : 0}
-              </button>
-            </div>
-
-            {/* landscape_photo */}
-            <div className="w-screen h-screen flex-shrink-0">
-              <img
-                src={post.landscape_photo || ''}
-                alt="Landscape"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* event_photo */}
-            <div className="w-screen h-screen flex-shrink-0">
-              <img
-                src={post.event_photo || ''}
-                alt="Event"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        ))
-      ) : (
-        <p>No posts available.</p> // 데이터가 없을 때 보여줄 메시지
-      )}
+    <div className="min-h-screen bg-gray-900 text-white relative">
+      <Mainpage postList={postList} userdata={userdata} />
+      {/* 클라이언트 컴포넌트에 데이터 전달 */}
     </div>
   )
 }
