@@ -1,53 +1,52 @@
-import prisma from '@/lib/prismaClient'
+// app/actions/mainActions.ts
 
-// 모든 게시글(Post)을 가져오는 함수
-export async function getPost() {
+import prisma from '@/lib/prismaClient'
+import { Post, User } from '@/types/post'
+
+// 모든 게시글 가져오기
+export async function getPost(): Promise<Post[]> {
   const postList = await prisma.post.findMany({
     orderBy: {
-      id: 'desc', // id 역순으로 정렬
+      id: 'desc',
     },
     include: {
-      user: true, // 게시글 작성자 정보 포함
-      likes: {
-        include: {
-          user: true, // 좋아요를 누른 사용자 정보 포함
-        },
-      },
-      cutes: {
-        include: {
-          user: true, // 귀여워요를 누른 사용자 정보 포함
-        },
-      },
-      surprises: {
-        include: {
-          user: true, // 놀라워요를 누른 사용자 정보 포함
-        },
-      },
-      awesomes: {
-        include: {
-          user: true, // 최고예요를 누른 사용자 정보 포함
-        },
-      },
+      user: true,
+      likes: true,
+      cutes: true,
+      surprises: true,
+      awesomes: true,
     },
   })
 
-  return postList
+  // 각 포스트의 post_id가 일치하는 반응 수를 계산
+  return postList.map((post) => ({
+    ...post,
+    likes: post.likes
+      ? post.likes.filter((like) => like.post_id === post.id).length
+      : 0,
+    cutes: post.cutes
+      ? post.cutes.filter((cute) => cute.post_id === post.id).length
+      : 0,
+    surprises: post.surprises
+      ? post.surprises.filter((surprise) => surprise.post_id === post.id).length
+      : 0,
+    awesomes: post.awesomes
+      ? post.awesomes.filter((awesome) => awesome.post_id === post.id).length
+      : 0,
+  }))
 }
 
-// 특정 사용자(User)를 id로 가져오는 함수
-export const getUserId = async (id: number) => {
+// 특정 유저 ID로 유저 정보 가져오기
+export async function getUserId(id: number): Promise<User | null> {
   const userdata = await prisma.user.findUnique({
     where: { id: id },
     include: {
-      posts: true, // 사용자가 작성한 게시글 포함
-      likes: true, // 사용자가 좋아요한 게시글 포함
-      cutes: true, // 사용자가 귀여워요한 게시글 포함
-      surprises: true, // 사용자가 놀라워요한 게시글 포함
-      awesomes: true, // 사용자가 최고예요한 게시글 포함
-      participatedEvents: true, // 사용자가 참가한 이벤트 포함
-      wonEvents: true, // 사용자가 우승한 이벤트 포함
+      posts: true,
+      likes: true,
+      cutes: true,
+      surprises: true,
+      awesomes: true,
     },
   })
-
   return userdata
 }

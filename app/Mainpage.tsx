@@ -1,59 +1,8 @@
+// app/Mainpage.tsx
+
 'use client'
 
-// 타입 정의
-type User = {
-  id: number
-  username: string
-  phone: string
-  created_at: string
-  updated_at: string
-  posts: Post[]
-  likes: Like[]
-  cutes: Cute[]
-  surprises: Surprise[]
-  awesomes: Awesome[]
-}
-
-type Post = {
-  id: number
-  user_id: number
-  event_photo: string
-  landscape_photo: string
-  created_at: Date
-  user: User
-  likes: Like[]
-  cutes: Cute[]
-  surprises: Surprise[]
-  awesomes: Awesome[]
-}
-
-type Like = {
-  id: number
-  user_id: number
-  post_id: number
-  created_at: Date
-}
-
-type Cute = {
-  id: number
-  user_id: number
-  post_id: number
-  created_at: Date
-}
-
-type Surprise = {
-  id: number
-  user_id: number
-  post_id: number
-  created_at: Date
-}
-
-type Awesome = {
-  id: number
-  user_id: number
-  post_id: number
-  created_at: Date
-}
+import { Post, User } from '@/types/post'
 
 export default function Mainpage({
   postList,
@@ -81,7 +30,6 @@ export default function Mainpage({
 
       const updatedPost = await response.json()
       console.log('Updated post:', updatedPost)
-      // 이 데이터를 이용해 UI 업데이트 가능 (예: 좋아요 수 갱신)
     } catch (error) {
       console.error('Error updating reaction:', error)
     }
@@ -89,15 +37,10 @@ export default function Mainpage({
 
   return (
     <div className="min-h-screen">
-      {/* 유저 데이터 출력 */}
-      {userdata ? (
-        <div>
-          <p>Logged in as: {userdata.username}</p>
-          <p>Phone: {userdata.phone}</p>
-        </div>
-      ) : (
-        <p>Loading user data...</p>
-      )}
+      <div>
+        <p>Logged in as: {userdata.username}</p>
+        <p>Phone: {userdata.phone}</p>
+      </div>
 
       {postList.map((post: Post, index: number) => (
         <div
@@ -107,36 +50,52 @@ export default function Mainpage({
           {/* Buttons */}
           <div className="text-xs absolute flex flex-col bottom-16 right-4 justify-center items-center">
             <button
-              className="bg-transparent rounded m-2 w-[40px] h-[40px]"
+              className="bg-transparent rounded m-2 w-10 h-10"
               onClick={() => handleReaction(post.id, 'Like')}
             >
-              <img src="/images/dotori-icon.png" alt="Likes" />
+              <img
+                src="/images/dotori-icon.png"
+                alt="Likes"
+                className="w-full h-full object-contain"
+              />
             </button>
-            <p>좋아요 : {post.likes.length || 0}</p>
+            <p>좋아요 : {post.likes || 0}</p>
 
             <button
-              className="bg-transparent rounded m-2 w-[40px] h-[40px]"
+              className="bg-transparent rounded m-2 w-10 h-10"
               onClick={() => handleReaction(post.id, 'Cute')}
             >
-              <img src="/images/mushroom.png" alt="Cute" />
+              <img
+                src="/images/mushroom.png"
+                alt="Cute"
+                className="w-full h-full object-contain"
+              />
             </button>
-            <p>귀여워요 : {post.cutes.length || 0}</p>
+            <p>귀여워요 : {post.cutes || 0}</p>
 
             <button
-              className="bg-transparent rounded m-2 w-[40px] h-[40px]"
+              className="bg-transparent rounded m-2 w-10 h-10"
               onClick={() => handleReaction(post.id, 'Surprise')}
             >
-              <img src="/images/leaf.png" alt="Surprise" />
+              <img
+                src="/images/leaf.png"
+                alt="Surprise"
+                className="w-full h-full object-contain"
+              />
             </button>
-            <p>놀라워요 : {post.surprises.length || 0}</p>
+            <p>놀라워요 : {post.surprises || 0}</p>
 
             <button
-              className="bg-transparent rounded m-2 w-[40px] h-[40px]"
+              className="bg-transparent rounded m-2 w-10 h-10"
               onClick={() => handleReaction(post.id, 'Awesome')}
             >
-              <img src="/images/pretzel.png" alt="Awesome" />
+              <img
+                src="/images/pretzel.png"
+                alt="Awesome"
+                className="w-full h-full object-contain"
+              />
             </button>
-            <p>최고예요 : {post.awesomes.length || 0}</p>
+            <p>최고예요 : {post.awesomes || 0}</p>
           </div>
 
           {/* landscape_photo */}
@@ -144,11 +103,7 @@ export default function Mainpage({
             <img
               src={post.landscape_photo}
               alt="Landscape"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
+              className="w-full h-full object-cover"
             />
           </div>
 
@@ -157,11 +112,7 @@ export default function Mainpage({
             <img
               src={post.event_photo}
               alt="Event"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
+              className="w-full h-full object-cover"
             />
           </div>
         </div>
