@@ -121,13 +121,16 @@ export default function Mainpage({
                 <div
                   className="w-full h-screen flex-shrink-0 transition-transform duration-500 ease-in-out"
                   style={{
-                    transform: `translateX(${currentImageIndex === 1 ? '100%' : '0'})`,
+                    transform: `translateX(${currentImageIndex === 1 ? '-100%' : '0'})`,
                   }}
                 >
                   <img
                     src={post.event_photo}
                     alt="Event"
                     className="w-full h-full object-cover"
+                    style={{
+                      visibility: post.event_photo ? 'visible' : 'hidden',
+                    }}
                   />
                 </div>
               </div>
